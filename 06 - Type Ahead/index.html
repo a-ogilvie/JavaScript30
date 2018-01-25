@@ -15,6 +15,9 @@
     </ul>
   </form>
 <script>
+
+let userLocation = getLocation();
+
 const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
 
 const cities = [];
@@ -29,7 +32,15 @@ function findMatches(wordToMatch, cities) {
 }
 
 function displayMatches() {
-  const matchArray = findMatches(this.value, cities);
+  let matchArray = findMatches(this.value, cities);
+
+  if (userLocation) {
+    matchArray.forEach(place => {
+      place.distance = getDistanceFromLatLon(place.latitude, place.longitude, userLocation.latitude, userLocation.longitude);
+    });
+    matchArray.sort((a, b) => a.distance - b.distance);
+  }
+
   const html = matchArray.map(place => {
     const regex = new RegExp(this.value, 'gi');
     const cityName = place.city.replace(regex, `<span class="hl">${this.value}</span>`);
@@ -37,10 +48,11 @@ function displayMatches() {
     return `
       <li>
         <span class="name">${cityName}, ${stateName}</span>
-        <span class="population">${numberWithCommas(place.population)}</span>
+        <span class="population">${userLocation ? numberWithCommas(Math.round(place.distance)) + ' km' : numberWithCommas(place.population)}</span>
       </li>
-    `;
+    `; // turned off auto-capitalisation in span.population css
   }).join('');
+
   suggestions.innerHTML = html;
 }
 
@@ -56,8 +68,38 @@ function numberWithCommas(x) {
 const searchInput = document.querySelector('.search');
 const suggestions = document.querySelector('.suggestions');
 
-// searchInput.addEventListener('change', displayMatches); -- why is this needed?
+// searchInput.addEventListener('change', displayMatches); -- why is this used?
 searchInput.addEventListener('keyup', displayMatches);
+
+// === Geolocation stuff ===
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {userLocation = pos.coords;});
+  }
+}
+
+// distance function adapted from http://www.movable-type.co.uk/scripts/latlong.html
+function getDistanceFromLatLon(latA, lonA, latB, lonB) {
+  
+  const R = 6371; // radius of the Earth in km
+  const latARad = convertDegToRad(latA);
+  const latBRad = convertDegToRad(latB);
+  const deltaLatRad = convertDegToRad(latB - latA);
+  const deltaLonRad = convertDegToRad(lonB - lonA);
+
+  // Haversine formula
+  const a = 
+    Math.pow(Math.sin(deltaLatRad / 2), 2) +
+    Math.cos(latARad) * Math.cos(latBRad) *
+    Math.sin(deltaLonRad / 2) * Math.sin(deltaLonRad / 2)
+    ;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); // distance in km
+}
+
+function convertDegToRad(deg) {
+  return deg * (Math.PI / 180);
+}
 
 </script>
   </body>

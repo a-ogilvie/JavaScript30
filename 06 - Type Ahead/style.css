@@ -64,6 +64,7 @@
 
     span.population {
       font-size: 15px;
+      text-transform: none;
     }
 
     .hl {
