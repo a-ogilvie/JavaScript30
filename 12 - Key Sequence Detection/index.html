@@ -8,14 +8,16 @@
 <body>
 <script>
   const keysPressed = [];
-  const secretCode = 'alex';
+  // WHY doesn't this secretCode work properly?
+  const secretCode = 'ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba';
+  secretCodeLength = 10;
   window.addEventListener('keyup', event => {
     keysPressed.push(event.key);
-    keysPressed.splice(-secretCode.length - 1, keysPressed.length - secretCode.length);
-    if (keysPressed.join('').includes(secretCode)) {
-      console.log('You got it!');
+    keysPressed.splice(-secretCodeLength - 1, keysPressed.length - secretCodeLength);
+    if (keysPressed.join('') === (secretCode)) {
       cornify_add();
     }
+    console.log(keysPressed.join(''));
   });
 </script>
 </body>
