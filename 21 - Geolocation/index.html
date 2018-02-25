@@ -61,13 +61,14 @@
     const arrow = document.querySelector('.arrow');
     const speed = document.querySelector('.speed-value');
 
-    navigator.geolocation.watchPosition((data) => {
-      console.log(data);
-      speed.textContent = data.coords.speed;
-      arrow.style.transform = `rotate(${data.coords.heading}deg)`;
-    }, (err) => {
-      console.error(err);
+    navigator.geolocation.watchPosition(geopos => {
+      speed.textContent = geopos.coords.speed;
+      arrow.style.transform = `rotate(${geopos.coords.heading}deg)`;
+    }, error => {
+      console.error(error);
+      alert('Hey! You have to let me know your location!');
     });
+
   </script>
 </body>
 </html>
