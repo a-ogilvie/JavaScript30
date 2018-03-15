@@ -37,13 +37,13 @@
 <script>
   const slider = document.querySelector('.items');
   let isDown = false;
-  let startX;
-  let scrollLeft;
+  let startX = null;
+  let scrollLeft = null;
 
-  slider.addEventListener('mousedown', (e) => {
+  slider.addEventListener('mousedown', (event) => {
     isDown = true;
     slider.classList.add('active');
-    startX = e.pageX - slider.offsetLeft;
+    startX = event.pageX - slider.offsetLeft;
     scrollLeft = slider.scrollLeft;
   });
 
@@ -57,14 +57,14 @@
     slider.classList.remove('active');
   });
 
-  slider.addEventListener('mousemove', (e) => {
-    if (!isDown) return;  // stop the fn from running
-    e.preventDefault();
-    const x = e.pageX - slider.offsetLeft;
-    const walk = (x - startX) * 3;
+  slider.addEventListener('mousemove', () => {
+    if (!isDown) return;
+
+    event.preventDefault();
+    const x = event.pageX - slider.offsetLeft;
+    const walk = x - startX;
     slider.scrollLeft = scrollLeft - walk;
   });
-
 </script>
 
   </body>
