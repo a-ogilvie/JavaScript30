@@ -34,54 +34,54 @@
 
 <script>
   const holes = document.querySelectorAll('.hole');
-  const scoreBoard = document.querySelector('.score');
+  const scoreboard = document.querySelector('.score');
   const moles = document.querySelectorAll('.mole');
-  let lastHole;
-  let timeUp = false;
+  let previousHole = null;
+  let timeIsUp = false;
   let score = 0;
 
-  function randomTime(min, max) {
+  function generateRandomTime(min, max) {
     return Math.round(Math.random() * (max - min) + min);
   }
 
-  function randomHole(holes) {
+  function selectRandomHole(holes) {
     const idx = Math.floor(Math.random() * holes.length);
-    const hole = holes[idx];
-    if (hole === lastHole) {
-      console.log('Ah nah thats the same one bud');
-      return randomHole(holes);
+    selectedHole = holes[idx];
+    if (selectedHole === previousHole) {
+      return selectRandomHole(holes);
     }
-    lastHole = hole;
-    return hole;
+    previousHole = selectedHole;
+    return selectedHole;
   }
 
-  function peep() {
-    const time = randomTime(200, 1000);
-    const hole = randomHole(holes);
+  function popout() {
+    const hole = selectRandomHole(holes);
     hole.classList.add('up');
     setTimeout(() => {
       hole.classList.remove('up');
-      if (!timeUp) peep();
-    }, time);
+      if (!timeIsUp) popout();
+    }, generateRandomTime(200, 1000));
   }
 
   function startGame() {
-    scoreBoard.textContent = 0;
-    timeUp = false;
     score = 0;
-    peep();
-    setTimeout(() => timeUp = true, 10000)
+    scoreboard.textContent = score;
+    timeIsUp = false;
+    popout();
+    setTimeout(() => { timeIsUp = true; }, 10000)
   }
 
-  function bonk(e) {
-    if(!e.isTrusted) return; // cheater!
+  function hitMole(event) {
+    if (!event.isTrusted) return;
+
     score++;
     this.parentNode.classList.remove('up');
-    scoreBoard.textContent = score;
+    scoreboard.textContent = score;
   }
 
-  moles.forEach(mole => mole.addEventListener('click', bonk));
+  moles.forEach(mole => mole.addEventListener('click', hitMole));
 
 </script>
 </body>
 </html>
+ 
